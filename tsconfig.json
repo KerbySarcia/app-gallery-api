@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["src/**/*.ts"],
+  "typeRoots": [ "src/types"],
+  "include": ["src/**/*.ts", "src/utils/seed.js", "src/types/**/*.d.ts"],
   "exclude": ["node_modules"]
 }
