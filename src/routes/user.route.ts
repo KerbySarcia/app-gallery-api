@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getUser,
   loginUser,
   logoutUser,
   registerUser,
@@ -7,6 +8,7 @@ import {
 import validateRequest from "../middlewares/validate-request.middleware";
 import {
   createUserValidator,
+  getUserValidator,
   loginUserValidator,
 } from "../validators/user.validator";
 
@@ -25,5 +27,11 @@ router.post(
 );
 
 router.post("/auth/logout", logoutUser);
+
+router.get(
+  "/:username",
+  validateRequest({ params: getUserValidator }),
+  getUser
+);
 
 export default router;

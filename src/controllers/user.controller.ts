@@ -1,9 +1,16 @@
 import User from "../models/user.model";
+import Follow from "../models/follow.model";
+
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { cookieOption } from "../constants/cookie-option.constant";
 import { statusCode } from "../constants/status-code.constant";
+
+// Define the expected structure of the payload
+interface MyJwtPayload extends JwtPayload {
+  userId: string;
+}
 
 export const registerUser = async (req: Request, res: Response) => {
   const { username, displayName, email, password } = req.body;
@@ -62,4 +69,48 @@ export const logoutUser = async (req: Request, res: Response) => {
   res.clearCookie("token");
 
   res.status(200).json({ message: "Logout successful" });
+};
+
+export const getUser = async (req: Request, res: Response) => {
+  const { username } = req.params;
+
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    res.status(404).json({ message: "User not found" });
+    return;
+  }
+
+  const { hashedPassword, ...detailsWithoutPassword } = user.toObject();
+
+  const followerCount = await Follow.countDocuments({ following: user._id });
+  const followingCount = await Follow.countDocuments({ follower: user._id });
+
+  const token = req.cookies.token;
+
+  if (!token) {
+    res.status(200).json({
+      ...detailsWithoutPassword,
+      followerCount,
+      followingCount,
+      isFollowing: false,
+    });
+  } else {
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as MyJwtPayload;
+
+    const isExists = await Follow.exists({
+      follower: payload.userId,
+      following: user._id,
+    });
+
+    res.status(200).json({
+      ...detailsWithoutPassword,
+      followerCount,
+      followingCount,
+      isFollowing: isExists ? true : false,
+    });
+  }
 };

@@ -36,4 +36,10 @@ const loginUserValidator = z
   })
   .strict();
 
-export { createUserValidator, loginUserValidator };
+const getUserValidator = z
+  .object({
+    username: z.string().min(1, { message: "Username is required" }),
+  })
+  .strict();
+
+export { createUserValidator, loginUserValidator, getUserValidator };

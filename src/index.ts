@@ -4,9 +4,11 @@ dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+import cors from "cors";
 
 import userRouter from "./routes/user.route";
 import pinRouter from "./routes/pin.route";
+import boardRouter from "./routes/board.route";
 
 import connectDB from "./utils/connect-db.util";
 
@@ -14,6 +16,7 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 app.use(fileUpload());
 
@@ -23,6 +26,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/users", userRouter);
 app.use("/api/pins", pinRouter);
+app.use("/api/boards", boardRouter);
 
 app.use(
   (
