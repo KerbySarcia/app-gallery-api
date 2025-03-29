@@ -114,3 +114,30 @@ export const getUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const followUser = async (req: Request, res: Response) => {
+  const { username } = req.params;
+
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    res.status(400).json({ message: "user does not exist!" });
+    return;
+  }
+
+  const isFollowing = await Follow.exists({
+    follower: res.locals.userId,
+    following: user._id,
+  });
+
+  if (isFollowing) {
+    await Follow.deleteOne({
+      follower: res.locals.userId,
+      following: user._id,
+    });
+  } else {
+    await Follow.create({ follower: res.locals.userId, following: user._id });
+  }
+
+  res.status(200).json({ message: "Successful" });
+};
