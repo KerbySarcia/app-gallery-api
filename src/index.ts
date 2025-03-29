@@ -9,6 +9,7 @@ import cors from "cors";
 import userRouter from "./routes/user.route";
 import pinRouter from "./routes/pin.route";
 import boardRouter from "./routes/board.route";
+import commentRouter from "./routes/comment.route";
 
 import connectDB from "./utils/connect-db.util";
 
@@ -27,6 +28,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/users", userRouter);
 app.use("/api/pins", pinRouter);
 app.use("/api/boards", boardRouter);
+app.use("/api/comments", commentRouter);
 
 app.use(
   (
